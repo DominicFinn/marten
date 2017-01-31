@@ -314,13 +314,6 @@ namespace Marten
             return _options.UseCharBufferPooling ? new CharArrayTextWriter.Pool(_writerPool) : null;
         }
 
-        private readonly StringBuilderPool _stringBuilderPool = new StringBuilderPool(null);
-
-        internal StringBuilderPool CreateStringBuilderPool()
-        {
-            return new StringBuilderPool(_stringBuilderPool);
-        }
-
         private IIdentityMap createMap(DocumentTracking tracking, CharArrayTextWriter.IPool sessionPool)
         {
             switch (tracking)
