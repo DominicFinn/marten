@@ -84,7 +84,7 @@ namespace Marten
             var cleaner = new DocumentCleaner(_connectionFactory, Schema.As<DocumentSchema>());
             if (options.UseCharBufferPooling)
             {
-                _writerPool = CharArrayTextWriter.DefaultPool;
+                _writerPool = new CharArrayTextWriter.Pool();
             }
 
             Advanced = new AdvancedOptions(cleaner, options, _serializer, Schema, _writerPool);
@@ -114,6 +114,8 @@ namespace Marten
 
         public virtual void Dispose()
         {
+            _writerPool.Dispose();
+            _stringBuilderPool.Dispose();
         }
 
         
@@ -307,9 +309,16 @@ namespace Marten
             return session;
         }
 
-        CharArrayTextWriter.Pool CreateWriterPool()
+        internal CharArrayTextWriter.Pool CreateWriterPool()
         {
             return _options.UseCharBufferPooling ? new CharArrayTextWriter.Pool(_writerPool) : null;
+        }
+
+        private readonly StringBuilderPool _stringBuilderPool = new StringBuilderPool(null);
+
+        internal StringBuilderPool CreateStringBuilderPool()
+        {
+            return new StringBuilderPool(_stringBuilderPool);
         }
 
         private IIdentityMap createMap(DocumentTracking tracking, CharArrayTextWriter.IPool sessionPool)
@@ -344,9 +353,9 @@ namespace Marten
         {
             var parser = new MartenQueryParser();
 
-            var session = new QuerySession(this, Schema, _serializer,
+            var session = new QuerySession(this,
                 new ManagedConnection(_connectionFactory, CommandRunnerMode.ReadOnly, options.IsolationLevel, options.Timeout), parser,
-                new NulloIdentityMap(_serializer), CreateWriterPool());
+                new NulloIdentityMap(_serializer));
 
             session.Logger = _logger.StartSession(session);
 
@@ -357,9 +366,9 @@ namespace Marten
         {
             var parser = new MartenQueryParser();
 
-            var session = new QuerySession(this, Schema, _serializer,
+            var session = new QuerySession(this,
                 new ManagedConnection(_connectionFactory, CommandRunnerMode.ReadOnly), parser,
-                new NulloIdentityMap(_serializer), CreateWriterPool());
+                new NulloIdentityMap(_serializer));
 
             session.Logger = _logger.StartSession(session);
 

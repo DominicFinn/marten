@@ -22,9 +22,9 @@ namespace Marten
         private readonly ISerializer _serializer;
         private readonly UnitOfWork _unitOfWork;
 
-        public DocumentSession(IDocumentStore store, StoreOptions options, IDocumentSchema schema,
+        public DocumentSession(DocumentStore store, StoreOptions options, IDocumentSchema schema,
             ISerializer serializer, IManagedConnection connection, IQueryParser parser, IIdentityMap identityMap, CharArrayTextWriter.Pool writerPool)
-            : base(store, schema, serializer, connection, parser, identityMap, writerPool)
+            : base(store, connection, parser, identityMap)
         {
             _options = options;
             _schema = schema;
