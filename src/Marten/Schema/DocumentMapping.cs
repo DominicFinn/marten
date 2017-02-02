@@ -155,7 +155,6 @@ namespace Marten.Schema
 
         public IDocumentUpsert BuildUpsert(IDocumentSchema schema)
         {
-            // TODO -- temporary
             return this.As<IDocumentMapping>().BuildStorage(schema).As<IDocumentUpsert>();
         }
 
